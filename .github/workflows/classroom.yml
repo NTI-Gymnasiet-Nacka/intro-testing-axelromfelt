@@ -1,0 +1,68 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: maxdiff1
+      id: maxdiff1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: maxdiff1
+        setup-command: ''
+        command: python3 max_diff.py
+        input: 10, 3, 5, 6
+        expected-output: '7'
+        comparison-method: exact
+        timeout: 10
+    - name: maxdiff2
+      id: maxdiff2
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: maxdiff2
+        setup-command: ''
+        command: python3 max_diff.py
+        input: 4, 4, 4
+        expected-output: '0'
+        comparison-method: exact
+        timeout: 10
+    - name: maxdiff3
+      id: maxdiff3
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: maxdiff3
+        setup-command: ''
+        command: python3 max_diff.py
+        input: 1, -2, 3, 7, -5
+        expected-output: '12'
+        comparison-method: exact
+        timeout: 10
+    - name: vowel
+      id: vowel
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: vowel
+        setup-command: ''
+        command: python3 vowel_count.py
+        input: aeiouAEIOU
+        expected-output: '10'
+        comparison-method: exact
+        timeout: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        MAXDIFF1_RESULTS: "${{steps.maxdiff1.outputs.result}}"
+        MAXDIFF2_RESULTS: "${{steps.maxdiff2.outputs.result}}"
+        MAXDIFF3_RESULTS: "${{steps.maxdiff3.outputs.result}}"
+        VOWEL_RESULTS: "${{steps.vowel.outputs.result}}"
+      with:
+        runners: maxdiff1,maxdiff2,maxdiff3,vowel
